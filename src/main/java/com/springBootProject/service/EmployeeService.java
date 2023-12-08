@@ -1,5 +1,6 @@
 package com.springBootProject.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,8 +20,9 @@ public class EmployeeService {
 		return save;
 	}
 
+	// with order By ASC
 	public List<Employee> GetAllEmployee() {
-		List<Employee> allEmployee = employeeRepository.findAll();
+		List<Employee> allEmployee = employeeRepository.findAllByOrderByJoiningDateAsc();
 		return allEmployee;
 	}
 
@@ -29,13 +31,25 @@ public class EmployeeService {
 		return employeeRepository.save(emp);
 	}
 
-	// HardDeleted
+	// HardDelete Or FostDelete
 	public void DeleteEmployee(int empId) {
 		employeeRepository.deleteById(empId);
 	}
 
 	public Employee GetEmployeeById(int empId) {
-		return employeeRepository.findById(empId).get();
+		try {
+			return employeeRepository.findById(empId).get();
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	public List<Employee> GetEmployeeByDepatment(String department) {
+		List<Employee> findByDepartment = employeeRepository.findByDepartment(department);
+//		for(Employee e :findByDepartment) {
+//			
+//		}
+		return findByDepartment;
 
 	}
 }

@@ -1,6 +1,8 @@
 package com.springBootProject.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springBootProject.model.Employee;
@@ -28,17 +31,27 @@ public class EmployeeController {
 		return new ResponseEntity(employee, HttpStatus.CREATED);// status code 201
 	}
 
-	@GetMapping(value = "/employee")
-	public ResponseEntity getAllEmployee() {
-		List<Employee> employees = employeeService.GetAllEmployee();
-
-		return new ResponseEntity(employees, HttpStatus.OK);// status code 200
+	@GetMapping(value = { "/employee" })
+	public ResponseEntity getAllEmployee(@RequestParam("department") Optional<String> department) {
+		List empList = new ArrayList<>();
+		if (department.isPresent()) {
+			empList = employeeService.GetEmployeeByDepatment(department.get());
+			System.out.println(empList);
+		} else {
+			empList = employeeService.GetAllEmployee();
+		}
+		return new ResponseEntity(empList, HttpStatus.OK);// status code 200
 	}
 
 	@GetMapping(value = "/employee/{employeeId}")
 	public ResponseEntity getEmployeeById(@PathVariable(required = true) int employeeId) {
 		Employee getEmployeeById = employeeService.GetEmployeeById(employeeId);
-		return new ResponseEntity(getEmployeeById, HttpStatus.OK);// status code 200
+		if (getEmployeeById != null) {
+			return new ResponseEntity(getEmployeeById, HttpStatus.OK);
+		} else {
+			return new ResponseEntity("{}", HttpStatus.OK);// status code 200
+		}
+
 	}
 
 	@PutMapping(value = "/employee/{employeeId}")
@@ -48,11 +61,17 @@ public class EmployeeController {
 		return new ResponseEntity(employee, HttpStatus.OK);
 	}
 
+	// This methods work with Soft DELETE
 	@DeleteMapping(value = "/employee/{employeeId}")
-	public ResponseEntity deleteEmployee(int empId) {
-		employeeService.DeleteEmployee(empId);
-
+	public ResponseEntity deleteEmployee(@PathVariable(required = true) int employeeId) {
+		employeeService.DeleteEmployee(employeeId);
 		return new ResponseEntity("", HttpStatus.OK);
 	}
+
+//	@DeleteMapping(value = "/employee/{employeeId}")
+//	public ResponseEntity Harddelete(@PathVariable(required = true) int employeeId) {
+//		employeeService.DeleteEmployee(employeeId);
+//		return new ResponseEntity("", HttpStatus.OK);
+//	}
 
 }

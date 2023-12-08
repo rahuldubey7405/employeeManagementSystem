@@ -1,9 +1,9 @@
 package com.springBootProject.model;
 
-import java.sql.Date;
 import java.time.LocalDate;
 
-import org.hibernate.annotations.DialectOverride.Where;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -18,7 +18,8 @@ import jakarta.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name = "employee")
-
+@SQLDelete(sql = "update employee set deleteStatus = true where id = ?")
+@Where(clause = "deleteStatus = 0")
 public class Employee {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +27,7 @@ public class Employee {
 	@Column(name = "name", nullable = false)
 	private String name;
 	@NotEmpty(message = "Email cannot be empty")
-	@Email(message = "Email should be valid")
+	@Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}", message = "Email should be valid")
 	@Column(name = "email")
 	private String email;
 	@Column(name = "department", nullable = false)
@@ -34,8 +35,8 @@ public class Employee {
 	@JsonFormat(pattern = "yyyy-MM-dd") // "yyyy-MM-dd HH:mm:ss"
 	@Column(name = "joiningdate", nullable = false)
 	private LocalDate joiningDate;
-//	@Column(name = "deletestatus", nullable = false)
-//	private boolean deleteStatus = false;
+	@Column(name = "deletestatus", nullable = false)
+	private boolean deleteStatus = false;
 
 	public int getId() {
 		return id;
@@ -75,6 +76,14 @@ public class Employee {
 
 	public void setJoiningDate(LocalDate joiningDate) {
 		this.joiningDate = joiningDate;
+	}
+
+	public boolean isDeleteStatus() {
+		return deleteStatus;
+	}
+
+	public void setDeleteStatus(boolean deleteStatus) {
+		this.deleteStatus = deleteStatus;
 	}
 
 }
