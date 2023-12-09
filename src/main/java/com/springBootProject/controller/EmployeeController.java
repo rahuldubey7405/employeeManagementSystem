@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.springBootProject.model.Employee;
 import com.springBootProject.service.EmployeeService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @RestController
 public class EmployeeController {
 	@Autowired
@@ -27,12 +29,14 @@ public class EmployeeController {
 	@PostMapping(value = "/employee")
 	public ResponseEntity addEmployee(@RequestBody Employee emp) {
 		Employee employee = employeeService.AddEmployee(emp);
-
 		return new ResponseEntity(employee, HttpStatus.CREATED);// status code 201
 	}
 
 	@GetMapping(value = { "/employee" })
-	public ResponseEntity getAllEmployee(@RequestParam("department") Optional<String> department) {
+	public ResponseEntity getAllEmployee(@RequestParam("department") Optional<String> department,
+			HttpServletRequest request) {
+		String token = request.getHeader("USER_API_TOKEN");
+		System.out.println(token);
 		List empList = new ArrayList<>();
 		if (department.isPresent()) {
 			empList = employeeService.GetEmployeeByDepatment(department.get());
@@ -51,7 +55,6 @@ public class EmployeeController {
 		} else {
 			return new ResponseEntity("{}", HttpStatus.OK);// status code 200
 		}
-
 	}
 
 	@PutMapping(value = "/employee/{employeeId}")
